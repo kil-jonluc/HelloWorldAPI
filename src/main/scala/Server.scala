@@ -4,6 +4,11 @@ import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import scala.concurrent.ExecutionContext
 
+import scala.util.{ Failure, Success }
+//import akka.actor.Status.Success
+//import akka.http.scaladsl.model.StatusCodes.Success
+import akka.http.scaladsl.model._
+
 object Server extends App {
 
   val host = "0.0.0.0"
@@ -19,5 +24,12 @@ object Server extends App {
   def route = path("hello") {  get {    complete("Hello, World!")  }};
 
   //Start the server
-  Http().bindAndHandle(route, host, port);
+  //Http().bindAndHandle(route, host, port);
+
+  //logging
+  val bindingFuture = Http().bindAndHandle(route, host, port);
+  bindingFuture.onComplete {
+    case Success(serverBinding) => println(s"listening to ${serverBinding.localAddress}")
+    case Failure(error) => println(s"error: ${error.getMessage}")
+  }
 }
